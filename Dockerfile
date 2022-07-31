@@ -1,7 +1,7 @@
 FROM node:14.16 AS BUILD_IMAGE
 
 # install node-prune
-RUN curl -sfL https://install.goreleaser.com/github.com/tj/node-prune.sh | bash -s -- -b /usr/local/bin
+RUN curl -sf https://gobinaries.com/tj/node-prune | bash -s -- -b /usr/local/bin
 
 WORKDIR /work
 
@@ -26,7 +26,7 @@ RUN apk add  --no-cache ffmpeg
 
 ENV TOKEN=$TOKEN 
 # ENV CRON_SCHEDULE="*/1 * * * *"
-ENV CRON_SCHEDULE="*/15 * * * *"
+ENV CRON_SCHEDULE="*/5 * * * *"
 ENV CRON_SCHEDULE_TIMELAPSE="0 7 * * *"
 
 WORKDIR /app
@@ -35,10 +35,6 @@ WORKDIR /app
 COPY --from=BUILD_IMAGE /work/dist ./dist
 COPY --from=BUILD_IMAGE /work/node_modules ./node_modules
 COPY --from=BUILD_IMAGE /work/package.json .
-
-# Setup the cron job to 
-RUN echo "$CRON_SCHEDULE cd /app && npm run snapshot" >> /etc/crontabs/root
-RUN echo "$CRON_SCHEDULE_TIMELAPSE cd /app && npm run timelapse" >> /etc/crontabs/root
 
 # Create the cron log
 RUN touch /var/log/cron.log
