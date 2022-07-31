@@ -1,0 +1,16 @@
+version: '3.7'
+
+services:
+  timelapse:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: deardooley/ring-timelapse:dev
+    environment:
+      - TOKEN=$TOKEN
+      - SLACK_WEBHOOK_URL=$SLACK_WEBHOOK_URL
+      - CRON_SCHEDULE=*/5 0-2,10-23 * * *
+      - CRON_SCHEDULE_TIMELAPSE=10 3 * * *
+    volumes:
+      - /Users/dooley/Pictures/timelapse:/app/dist/target
+    restart: always

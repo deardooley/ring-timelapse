@@ -26,7 +26,7 @@ npx -p ring-client-api ring-auth-cli
 Use the following to pull the Docker container from Docker hub.
 
 ``` bash
-docker pull wictorwilen/ring-timelapse
+docker pull deardooley/ring-timelapse
 ```
 
 Before starting the container, create a directory that will be shared with the 
@@ -43,12 +43,21 @@ Start the container by running:
 docker run 
   -d 
   -e TOKEN="<insert token here>" 
-  -v "/media/timelapse:/app/dist/target" 
+  -e SLACK_INCOMING_WEBHOOK="<insert webhook url here>"
+  -v "$HOME/media/timelapse:/app/dist/target" 
   --restart unless-stopped 
-  wictorwilen/ring-timelapse
+  deardooley/ring-timelapse
 ```
 
 > **NOTE**: In the `-v` argument replace the local path (`/media/timelapse`) with the directory you created
+
+or using the `docker-compose.yml` file.
+
+```bash
+docker-compose up -d
+```
+
+> **NOTE**: Define your TOKEN and SLACK_INCOMING_WEBHOOK variables in a `.env` file in the same directory as the compose file.
 
 ## Environment Variables
 
@@ -56,15 +65,19 @@ The following variables are required:
 
 `TOKEN` - your generated Ring token, see Installation
 
+`SLACK_INCOMING_WEBHOOK` - URL to post errors and new video notifications
+
 The following variables are optional:
 
 `CRON_SCHEDULE` - Schedule for taking snapshots, in [Crontab format](https://linuxhandbook.com/crontab/). Default: `*/15 * * * *`
 
 `CRON_SCHEDULE_TIMELAPSE` - Schedule for generating the timelapse video. Default: `0 7 * * *`
 
+
 ## Authors
 
 - [@wictorwilen](https://www.github.com/wictorwilen)
+- [@deardooley](https://www.github.com/deardooley)
   
 ## License
 
