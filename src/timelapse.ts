@@ -48,9 +48,6 @@ async function timelapse() {
                     const snapshotFilePath = path.resolve(__dirname, "target", f, file);
                     const snapshotStat = statSync(snapshotFilePath);
 
-                    console.log(`Timestamp of file ${snapshotFilePath} is ` + snapshotStat.ctime.toISOString());
-                    console.log(`Timestamp of file ${snapshotFilePath} is ` + snapshotStat.ctimeMs);
-                    console.log(snapshotStat);
                     // add file to zip archive
                     zip.file(file, readFileSync(snapshotFilePath), {
                         date: snapshotStat.ctime
