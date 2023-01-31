@@ -32,7 +32,7 @@ async function snapshot() {
 
     cameras.forEach(camera => {
         const name = lodash.camelCase(camera.name);
-        if (name !== 'frontDoor') {
+        if (name !== 'frontDoor' && name !== 'frontYardFence' && name !== 'frontyardGate') {
             log(`Retrieving snapshot for ${camera.name}`);
 
             camera.getSnapshot().then(function (result) {
