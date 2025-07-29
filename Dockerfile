@@ -1,4 +1,4 @@
-FROM node:14.16 AS BUILD_IMAGE
+FROM node:20.10 AS BUILD_IMAGE
 
 # install node-prune
 RUN curl -sf https://gobinaries.com/tj/node-prune | bash -s -- -b /usr/local/bin
@@ -19,7 +19,7 @@ RUN npm prune --production
 # run node prune
 RUN /usr/local/bin/node-prune
 
-FROM node:14.16-alpine
+FROM node:20.10-alpine
 
 # add ffmpeg
 RUN apk add  --no-cache ffmpeg
@@ -27,7 +27,7 @@ RUN apk add  --no-cache ffmpeg
 ENV TOKEN=$TOKEN 
 # ENV CRON_SCHEDULE="*/1 * * * *"
 ENV CRON_SCHEDULE="*/5 * * * *"
-ENV CRON_SCHEDULE_TIMELAPSE="0 7 * * *"
+ENV CRON_SCHEDULE_TIMELAPSE="10 3 * * *"
 
 WORKDIR /app
 

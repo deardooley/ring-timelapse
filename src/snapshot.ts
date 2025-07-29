@@ -1,7 +1,7 @@
 // Copyright (c) Wictor Wilén. All rights reserved. 
 // Licensed under the MIT license.
 
-import { writeFile, mkdirSync, existsSync } from 'fs';
+import { writeFileSync, mkdirSync, existsSync } from 'fs';
 import { RingApi } from 'ring-client-api'
 import * as path from 'path'
 import * as dotenv from "dotenv";
@@ -16,7 +16,7 @@ const webhook = new IncomingWebhook(url, {
     icon_emoji: ':camera:',
 });
 
-async function snapshot() {
+const snapshot = async (): Promise<void> => {
     log("running snapshot")
     const ringApi = new RingApi({
         refreshToken: process.env.TOKEN as string,
@@ -30,35 +30,31 @@ async function snapshot() {
         mkdirSync(path.resolve(__dirname, "target"));
     }
 
-    cameras.forEach(camera => {
+    for (const camera of cameras) {
         const name = lodash.camelCase(camera.name);
         if (name !== 'frontDoor' && name !== 'frontYardFence' && name !== 'frontyardGate') {
             log(`Retrieving snapshot for ${camera.name}`);
 
-            camera.getSnapshot().then(function (result) {
-                try {
-                    log((path.resolve(__dirname, "target", name)));
-                    if (!existsSync(path.resolve(__dirname, "target", name))) {
-                        mkdirSync(path.resolve(__dirname, "target", name));
-                    }
-                    writeFile(path.resolve(__dirname, "target", path.join(name, Date.now() + '.png')), result, (err) => {
-                        if (err) throw err;
-                        log('Saved!');
-                    });
-                } catch (err) {
-                    log(`Error: ${err}`);
-                    slackError(`Failed saving snapshot from camera ${camera.name}: ${err.message}`);
+            try {
+                const result = await camera.getSnapshot();
+
+                log((path.resolve(__dirname, "target", name)));
+                if (!existsSync(path.resolve(__dirname, "target", name))) {
+                    mkdirSync(path.resolve(__dirname, "target", name));
                 }
 
-            }).catch(err => {
+                writeFileSync(path.resolve(__dirname, "target", path.join(name, Date.now() + '.png')), result, );
+                log(`Snapshot for ${camera.name} saved`);
+            }
+            catch (err) {
                 log(`Snapshot error: ${err}`);
-                slackError(`Failed fetching snapshot from camera ${camera.name}: ${err.message}`);
-                slackError(err);
-            })
+                slackError(`Failed fetching snapshot from camera ${camera.name}: ${err}`);
+                slackError(`${err}`);
+            }
         } else {
             log(`Skipping snapshot for ${camera.name}`);
         }
-    });
+    }
 }
 
 // Send the notification
@@ -70,4 +66,10 @@ async function slackError(msg: String) {
 
 dotenv.config();
 
-snapshot()
+snapshot() .then(() => {
+    log("done");
+    process.exit(0);
+})
+.catch(err => {
+    log(err)
+});
